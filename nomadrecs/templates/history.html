@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    History
+{% endblock %}
+
+
+{% block main %}
+    <table>
+        <thead>
+            <tr>
+                <th>Country</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for trip in trips %}
+                <tr>
+                    <td>{{ trip.country }}</td>
+                    <td>{{ trip.start_date }}</td>
+                    <td>{{ trip.end_date }}</td>
+                    <td>
+                        <form action="/remove_trip" method="post">
+                            <input name="id" type="hidden" value="{{ trip.id }}">
+                            <button class="btn btn-primary" type="submit">Remove Trip</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Map
+{% endblock %}
+
+{% block main %}
+<h2>Your Travel Map</h2>
+<div id="map" style="height: 600px; border-radius: 8px;"></div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
+<script>
+    // Initialize map centered on world (adjust `initialZoom` below)
+    const initialCenter = [20, 0];
+    // Default zoom level for initial view
+    const initialZoom = 2;
+   
+    // Create map with an explicit minZoom so very-small zooms are allowed
+    const map = L.map('map', { center: initialCenter, zoom: initialZoom, minZoom: 0 });
+
+    // Add tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19,
+        minZoom: 0
+    }).addTo(map);
+    
+    // Countries visited
+    const countries = {{ countries | tojson }};
+    
+    // Geocoding data - map countries to approximate coordinates
+    const countryCoordinates = {
+        'United States': [37.0902, -95.7129],
+        'Canada': [56.1304, -106.3468],
+        'Mexico': [23.6345, -102.5528],
+        'United Kingdom': [55.3781, -3.4360],
+        'France': [46.2276, 2.2137],
+        'Germany': [51.1657, 10.4515],
+        'Italy': [41.8719, 12.5674],
+        'Spain': [40.4637, -3.7492],
+        'Japan': [36.2048, 138.2529],
+        'China': [35.8617, 104.1954],
+        'India': [20.5937, 78.9629],
+        'Australia': [-25.2744, 133.7751],
+        'Brazil': [-14.2350, -51.9253],
+        'Argentina': [-38.4161, -63.6167],
+        'New Zealand': [-40.9006, 174.8860],
+        'Thailand': [15.8700, 100.9925],
+        'Vietnam': [14.0583, 108.2772],
+        'South Korea': [35.9078, 127.7669],
+        'Philippines': [12.8797, 121.7740],
+        'Indonesia': [-0.7893, 113.9213],
+        'Netherlands': [52.1326, 5.2913],
+        'Belgium': [50.5039, 4.4699],
+        'Switzerland': [46.8182, 8.2275],
+        'Austria': [47.5162, 14.5501],
+        'Greece': [39.0742, 21.8243],
+        'Portugal': [39.3999, -8.2245],
+        'Ireland': [53.4129, -8.2439],
+        'Poland': [51.9194, 19.1451],
+        'Czech Republic': [49.8175, 15.4730],
+        'Sweden': [60.1282, 18.6435],
+        'Norway': [60.4720, 8.4689],
+        'Denmark': [56.2639, 9.5018],
+        'Turkey': [38.9637, 35.2433],
+        'Egypt': [26.8206, 30.8025],
+        'South Africa': [-30.5595, 22.9375],
+        'Kenya': [-0.0236, 37.9062],
+        'Morocco': [31.7917, -7.0926],
+        'Iceland': [64.9631, -19.0208],
+        'Singapore': [1.3521, 103.8198],
+        'Malaysia': [4.2105, 101.6964],
+        'Russia': [61.5240, 105.3188]
+    };
+    
+    // Add markers for each country
+    countries.forEach(country => {
+        const coords = countryCoordinates[country];
+        if (coords) {
+            L.circleMarker(coords, {
+                radius: 8,
+                fillColor: '#3388ff',
+                color: '#000',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.8
+            })
+            .bindPopup(`<b>${country}</b>`)
+            .addTo(map);
+        }
+    });
+    // Make sure the map renders correctly after being added to the page
+    // and that the initial zoom/center is respected.
+    setTimeout(() => map.invalidateSize(), 200);
+
+</script>
+
+<style>
+    #map {
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+</style>
+
+{% endblock %}
