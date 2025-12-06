@@ -47,8 +47,10 @@ def deregister():
 def index():
     """Show places visited"""
 
-    # Render portfolio
-    return render_template("index.html")
+    # Get all countries visited by the user
+    trips = db.execute("SELECT country FROM history WHERE user_id = :user_id", user_id=session["user_id"])
+    countries = list({trip["country"].strip().title() for trip in trips if trip["country"] and trip["country"].strip()})
+    return render_template("index.html", countries=countries)
 
 
 @app.route("/addtrip", methods=["GET", "POST"])
@@ -117,15 +119,39 @@ def history():
     return render_template("history.html", trips=trips)
 
 
-@app.route("/get_recs")
+@app.route("/recs", methods=["GET", "POST"])
 @login_required
-def history():
-    """Get recs for you next destination."""
-    country=request.form.get("country")
-    trips = db.execute(
-        "SELECT recs FROM history WHERE country = :?", country)
-    return render_template("history.html", trips=trips)
+def recs():
+    if request.method == "POST":
+        """Get recs for you next destination."""
+        recs=request.form.get("country")
+        return render_template("get_recs.html", recs=recs)
+    else:
+        return render_template("recs.html")
+    
+@app.route("/get_recs", methods=["POST"])
+@login_required
+def get_recs():
+        # Get recs for your next destination
+        country = request.form.get("country")
+        recs = db.execute("SELECT recs.recommendation, users.username FROM recs JOIN users ON recs.user_id = users.id WHERE recs.country = :country", country=country)
+        if not recs:
+            return render_template("first_rec.html", country=country)
+        return render_template("get_recs.html", recs=recs, country=country)
 
+@app.route("/add_recs", methods=["POST"])
+@login_required
+def add_recs():
+        country = request.form.get("country")
+        # Get form data
+        recommendation = request.form.get("recommendation")
+        # Insert into recs database
+        db.execute("INSERT INTO recs (user_id, country, recommendation) VALUES (?, ?, ?)", session["user_id"], country, recommendation)
+        # Query all recs for the country
+        recs = db.execute("SELECT recommendation FROM recs WHERE country = ?", country)
+        return render_template("get_recs.html", recs=recs, country=country)
+
+    
 
 
 @app.route("/login", methods=["GET", "POST"])

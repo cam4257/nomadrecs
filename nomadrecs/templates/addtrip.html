@@ -9,6 +9,7 @@
         <h3>Enter details to add a trip!</h3>
         <p>Country:*</p>
             <select name="country" id="country" required>
+            <!--Source for country list: https://gist.github.com/kalinchernev/486393efcca01623b18d-->
                 <option value="" selected disabled>Select a country</option>
                 <option>Afghanistan</option>
                 <option>Albania</option>
@@ -207,10 +208,11 @@
                 <option>Zambia</option>
                 <option>Zimbabwe</option>
             </select>
+            <!--Source for date picker: https://www.w3schools.com/tags/att_input_type_date.asp -->
             <p></p>
-            <p>Start Date:</p><input autocomplete="off" autofocus class="form-control mx-auto w-auto" name='start_date' placeholder="mm/dd/yy" type="text">
+            <p>Start Date:</p><input autocomplete="off" autofocus class="form-control mx-auto w-auto" name='start_date' placeholder="mm/dd/yy" type="date">
             <p></p>
-            <p>End Date:</p><input autocomplete="off" autofocus class="form-control mx-auto w-auto" name='end_date' placeholder="mm/dd/yy" type="text">
+            <p>End Date:</p><input autocomplete="off" autofocus class="form-control mx-auto w-auto" name='end_date' placeholder="mm/dd/yy" type="date">
         <p></p>
             <button class="btn btn-primary" type="submit">Add</button>
     </form>

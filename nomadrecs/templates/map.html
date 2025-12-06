@@ -5,103 +5,83 @@
 {% endblock %}
 
 {% block main %}
+<!--Source for map code: https://developers.google.com/maps/documentation/javascript/adding-a-google-map -->
+<!--I created a google API account to get an API key for this map -->
+<!--I Used AI to help with creating the code to display visited countries on the map -->
+
 <h2>Your Travel Map</h2>
-<div id="map" style="height: 600px; border-radius: 8px;"></div>
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-
+<div id="map" style="height: 600px; width: 100%; border-radius: 8px;"></div>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCQBiFZbQ2p3015nXBZIKoGskcDqwO4q4I"></script>
 <script>
-    // Initialize map centered on world (adjust `initialZoom` below)
-    const initialCenter = [20, 0];
-    // Default zoom level for initial view
-    const initialZoom = 2;
-   
-    // Create map with an explicit minZoom so very-small zooms are allowed
-    const map = L.map('map', { center: initialCenter, zoom: initialZoom, minZoom: 0 });
+  // Country coordinates lookup
+  const countryCoordinates = {
+    'United States': { lat: 37.0902, lng: -95.7129 },
+    'Canada': { lat: 56.1304, lng: -106.3468 },
+    'Mexico': { lat: 23.6345, lng: -102.5528 },
+    'United Kingdom': { lat: 55.3781, lng: -3.4360 },
+    'France': { lat: 46.2276, lng: 2.2137 },
+    'Germany': { lat: 51.1657, lng: 10.4515 },
+    'Italy': { lat: 41.8719, lng: 12.5674 },
+    'Spain': { lat: 40.4637, lng: -3.7492 },
+    'Japan': { lat: 36.2048, lng: 138.2529 },
+    'China': { lat: 35.8617, lng: 104.1954 },
+    'India': { lat: 20.5937, lng: 78.9629 },
+    'Australia': { lat: -25.2744, lng: 133.7751 },
+    'Brazil': { lat: -14.2350, lng: -51.9253 },
+    'Argentina': { lat: -38.4161, lng: -63.6167 },
+    'New Zealand': { lat: -40.9006, lng: 174.8860 },
+    'Thailand': { lat: 15.8700, lng: 100.9925 },
+    'Vietnam': { lat: 14.0583, lng: 108.2772 },
+    'South Korea': { lat: 35.9078, lng: 127.7669 },
+    'Philippines': { lat: 12.8797, lng: 121.7740 },
+    'Indonesia': { lat: -0.7893, lng: 113.9213 },
+    'Netherlands': { lat: 52.1326, lng: 5.2913 },
+    'Belgium': { lat: 50.5039, lng: 4.4699 },
+    'Switzerland': { lat: 46.8182, lng: 8.2275 },
+    'Austria': { lat: 47.5162, lng: 14.5501 },
+    'Greece': { lat: 39.0742, lng: 21.8243 },
+    'Portugal': { lat: 39.3999, lng: -8.2245 },
+    'Ireland': { lat: 53.4129, lng: -8.2439 },
+    'Poland': { lat: 51.9194, lng: 19.1451 },
+    'Czech Republic': { lat: 49.8175, lng: 15.4730 },
+    'Sweden': { lat: 60.1282, lng: 18.6435 },
+    'Norway': { lat: 60.4720, lng: 8.4689 },
+    'Denmark': { lat: 56.2639, lng: 9.5018 },
+    'Turkey': { lat: 38.9637, lng: 35.2433 },
+    'Egypt': { lat: 26.8206, lng: 30.8025 },
+    'South Africa': { lat: -30.5595, lng: 22.9375 },
+    'Kenya': { lat: -0.0236, lng: 37.9062 },
+    'Morocco': { lat: 31.7917, lng: -7.0926 },
+    'Iceland': { lat: 64.9631, lng: -19.0208 },
+    'Singapore': { lat: 1.3521, lng: 103.8198 },
+    'Malaysia': { lat: 4.2105, lng: 101.6964 },
+    'Russia': { lat: 61.5240, lng: 105.3188 }
+  };
 
-    // Add tile layer
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
-        maxZoom: 19,
-        minZoom: 0
-    }).addTo(map);
-    
-    // Countries visited
-    const countries = {{ countries | tojson }};
-    
-    // Geocoding data - map countries to approximate coordinates
-    const countryCoordinates = {
-        'United States': [37.0902, -95.7129],
-        'Canada': [56.1304, -106.3468],
-        'Mexico': [23.6345, -102.5528],
-        'United Kingdom': [55.3781, -3.4360],
-        'France': [46.2276, 2.2137],
-        'Germany': [51.1657, 10.4515],
-        'Italy': [41.8719, 12.5674],
-        'Spain': [40.4637, -3.7492],
-        'Japan': [36.2048, 138.2529],
-        'China': [35.8617, 104.1954],
-        'India': [20.5937, 78.9629],
-        'Australia': [-25.2744, 133.7751],
-        'Brazil': [-14.2350, -51.9253],
-        'Argentina': [-38.4161, -63.6167],
-        'New Zealand': [-40.9006, 174.8860],
-        'Thailand': [15.8700, 100.9925],
-        'Vietnam': [14.0583, 108.2772],
-        'South Korea': [35.9078, 127.7669],
-        'Philippines': [12.8797, 121.7740],
-        'Indonesia': [-0.7893, 113.9213],
-        'Netherlands': [52.1326, 5.2913],
-        'Belgium': [50.5039, 4.4699],
-        'Switzerland': [46.8182, 8.2275],
-        'Austria': [47.5162, 14.5501],
-        'Greece': [39.0742, 21.8243],
-        'Portugal': [39.3999, -8.2245],
-        'Ireland': [53.4129, -8.2439],
-        'Poland': [51.9194, 19.1451],
-        'Czech Republic': [49.8175, 15.4730],
-        'Sweden': [60.1282, 18.6435],
-        'Norway': [60.4720, 8.4689],
-        'Denmark': [56.2639, 9.5018],
-        'Turkey': [38.9637, 35.2433],
-        'Egypt': [26.8206, 30.8025],
-        'South Africa': [-30.5595, 22.9375],
-        'Kenya': [-0.0236, 37.9062],
-        'Morocco': [31.7917, -7.0926],
-        'Iceland': [64.9631, -19.0208],
-        'Singapore': [1.3521, 103.8198],
-        'Malaysia': [4.2105, 101.6964],
-        'Russia': [61.5240, 105.3188]
-    };
-    
-    // Add markers for each country
-    countries.forEach(country => {
-        const coords = countryCoordinates[country];
-        if (coords) {
-            L.circleMarker(coords, {
-                radius: 8,
-                fillColor: '#3388ff',
-                color: '#000',
-                weight: 2,
-                opacity: 1,
-                fillOpacity: 0.8
-            })
-            .bindPopup(`<b>${country}</b>`)
-            .addTo(map);
-        }
+  // Countries visited from Flask
+  const countries = {{ countries | tojson }};
+
+  function initMap() {
+    // Default center
+    const center = { lat: 20, lng: 0 };
+    const map = new google.maps.Map(document.getElementById('map'), {
+      zoom: 2,
+      center: center
     });
-    // Make sure the map renders correctly after being added to the page
-    // and that the initial zoom/center is respected.
-    setTimeout(() => map.invalidateSize(), 200);
-
+    // Add a marker for each country
+    countries.forEach(function(country) {
+      const coords = countryCoordinates[country];
+      if (coords) {
+        new google.maps.Marker({
+          position: coords,
+          map: map,
+          title: country
+        });
+      }
+    });
+  }
+  window.onload = initMap;
 </script>
 
-<style>
-    #map {
-        margin-top: 20px;
-        margin-bottom: 20px;
-    }
-</style>
 
 {% endblock %}

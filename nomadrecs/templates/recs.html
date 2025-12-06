@@ -1,12 +1,12 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Quote
+    Get Recommendations
 {% endblock %}
 
 {% block main %}
     <form action="/get_recs" method="post">
-        <h3>Check what others are saying about your destination!</h3>
+        <h3>Select a Country to get or add recs!</h3>
         <p>Country:*</p>
             <select name="country" id="country" required>
                 <option value="" selected disabled>Select a country</option>

@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    First Recommendation
+{% endblock %}
+
+
+{% block main %}
+    <h2>No recommendations yet for {{ country }}!</h2>
+    <p>Be the first to add one!</p>
+    <form action="/add_recs" method="post">
+        <p>Recommendation:*</p>
+        <input type="hidden" name="country" value="{{ country }}">
+        <textarea name="recommendation" rows="4" cols="50" required></textarea>
+        <p></p>
+        <button class="btn btn-primary" type="submit">Submit new Recs</button>
+    </form>
+{% endblock %}
+

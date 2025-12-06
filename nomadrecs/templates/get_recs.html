@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Get Recommendations
+{% endblock %}
+
+
+{% block main %}
+    <table>
+        <thead>
+            <tr>
+                <th>Recommended by:</th>
+                <th>Rec:</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for rec in recs %}
+                <tr>
+                    <td>{{ rec.username }}</td>
+                    <td>{{ rec.recommendation }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <form action="/add_recs" method="post">
+        <!--https://www.w3schools.com/tags/tag_textarea.asp-->
+        <h3>Add your own recommendations for this country!</h3>
+        <p>Recommendation:*</p>
+        <input type="hidden" name="country" value="{{ country }}">
+        <textarea name="recommendation" rows="4" cols="50" required></textarea>
+        <p></p>
+        <button class="btn btn-primary" type="submit">Submit new Recs</button>
+    </form>
+{% endblock %}
+

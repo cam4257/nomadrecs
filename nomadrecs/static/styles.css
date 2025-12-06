@@ -21,6 +21,12 @@ nav .navbar-brand .green
 {
     color: #2e944b;
 }
+
+nav .nav-link
+{
+    color: white;
+    font-size: large;
+}
 table {
     background-color: transparent;
     margin-bottom: 1rem;
@@ -39,3 +45,6 @@ select {
     font-size: 16px;
 }
 
+body {
+  background-color: #f0f8ff; /* Light blue */
+}

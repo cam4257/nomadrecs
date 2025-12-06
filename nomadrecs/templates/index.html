@@ -5,5 +5,7 @@
 {% endblock %}
 
 {% block main %}
-<h2>Welcome home</h2>
+<h2>Welcome Home!</h2>
+    <p>You have visited {{ countries|length }} out of 196 countries so far!</p>
+    <p>That is {{ (countries|length / 196 * 100) | round(2) }}% of the world!</p>
 {% endblock %}
