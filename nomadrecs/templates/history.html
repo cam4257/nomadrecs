@@ -12,6 +12,7 @@
                 <th>Country</th>
                 <th>Start Date</th>
                 <th>End Date</th>
+                <th>Private Note</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -21,6 +22,7 @@
                     <td>{{ trip.country }}</td>
                     <td>{{ trip.start_date }}</td>
                     <td>{{ trip.end_date }}</td>
+                    <td>{{ trip.private_note }}</td>
                     <td>
                         <form action="/remove_trip" method="post">
                             <input name="id" type="hidden" value="{{ trip.id }}">

@@ -52,36 +52,41 @@ def index():
     countries = list({trip["country"].strip().title() for trip in trips if trip["country"] and trip["country"].strip()})
     return render_template("index.html", countries=countries)
 
+# @app.route("/like_rec", methods=["POST"])
+# @login_required
+# def like_rec():
+#     rec_id = request.form.get("rec_id")
+#     user_id = session["user_id"]
+#     # Prevent duplicate likes
+#     try:
+#         db.execute("INSERT INTO likes (user_id, rec_id) VALUES (?, ?)", user_id, rec_id)
+#     except:
+#         pass  # Already liked
+#     # Optionally update like count in recs or just count from likes table
+#     return redirect(request.referrer or "/")
 
 @app.route("/addtrip", methods=["GET", "POST"])
 @login_required
 def addtrip():
     """Enable user to add a trip."""
-
     # POST
     if request.method == "POST":
-
         # Validate form submission
-
         if not request.form.get("country"):
             return apology("Missing Country")
-
-        # Get form data
+        # Get user input
         country = request.form.get("country")
         start_date = request.form.get("start_date")
         end_date = request.form.get("end_date")
+        private_note = request.form.get("private_note")
 
-        # Record trip
-        db.execute("""INSERT INTO history (user_id, country, start_date, end_date)
-            VALUES(:user_id, :country, :start_date, :end_date)""",
-                   user_id=session["user_id"], country=country, start_date=start_date, end_date=end_date)
-
-
+        # Add trip to DB
+        db.execute("""INSERT INTO history (user_id, country, start_date, end_date, private_note)
+            VALUES(:user_id, :country, :start_date, :end_date, :private_note)""",
+                   user_id=session["user_id"], country=country, start_date=start_date, end_date=end_date, private_note=private_note)
         # Let user know trip was added
         flash("Trip added!")
         return redirect("/history")
-
-    # GET
     else:
         return render_template("addtrip.html")
 
@@ -89,10 +94,8 @@ def addtrip():
 @app.route("/check", methods=["GET"])
 def check():
     """Return true if username available, else false, in JSON format"""
-
     # Get username
     username = request.args.get("username")
-
     # Check for username
     if not len(username) or db.execute("SELECT 1 FROM users WHERE username = :username", username=username):
         return jsonify(False)
@@ -103,6 +106,7 @@ def check():
 @app.route("/map")
 @login_required
 def map():
+    #loads a map of places visited by the user
     """Display map of places visited."""
     trips = db.execute(
         "SELECT country FROM history WHERE user_id = :user_id", user_id=session["user_id"])
@@ -112,10 +116,13 @@ def map():
 
 @app.route("/history")
 @login_required
+#loads a list of the trips a user has added and their details. 
 def history():
     """Display user's travel history."""
     trips = db.execute(
         "SELECT * FROM history WHERE user_id = :user_id", user_id=session["user_id"])
+    if not trips:
+        flash("You have not added any trips yet!")
     return render_template("history.html", trips=trips)
 
 
@@ -134,7 +141,12 @@ def recs():
 def get_recs():
         # Get recs for your next destination
         country = request.form.get("country")
-        recs = db.execute("SELECT recs.recommendation, users.username FROM recs JOIN users ON recs.user_id = users.id WHERE recs.country = :country", country=country)
+        recs = db.execute(
+            "SELECT recs.id, recs.recommendation, users.username, "
+            "(SELECT COUNT(*) FROM likes WHERE likes.rec_id = recs.id) AS like_count "
+            "FROM recs JOIN users ON recs.user_id = users.id WHERE recs.country = :country",
+            country=country
+        )
         if not recs:
             return render_template("first_rec.html", country=country)
         return render_template("get_recs.html", recs=recs, country=country)

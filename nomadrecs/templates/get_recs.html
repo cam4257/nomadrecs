@@ -19,6 +19,13 @@
                 <tr>
                     <td>{{ rec.username }}</td>
                     <td>{{ rec.recommendation }}</td>
+                    <!-- <td>
+                        <form action="/like_rec" method="post" style="display:inline;">
+                            <input type="hidden" name="rec_id" value="{{ rec.id }}">
+                            <button type="submit">Like</button>
+                        </form>
+                    {{ rec.like_count or 0 }} likes
+                    </td> -->
                 </tr>
             {% endfor %}
         </tbody>
